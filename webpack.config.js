@@ -42,6 +42,7 @@ var distConfigs  = {
     },
     output: {
         path: BUILD_PATH,
+        libraryTarget: "umd",
         filename: '[name].js'
     },
     externals:  {
