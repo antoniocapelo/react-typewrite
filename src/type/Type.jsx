@@ -37,6 +37,7 @@ class TypeWriter extends React.Component {
         };
     }
     render() {
+        const CURSOR_CLASS_NAME = 'react-typewrite-cursor-blink';
         const isReady = this.ready();
         const baseStr = _.take(this.state.textsToType, this.state.textIndex).join('');
         const newStr = this.state.base.substring(0, this.state.current);
@@ -48,7 +49,7 @@ class TypeWriter extends React.Component {
             <div className="type-container">
                 <p>
                     {toPrint}
-                    <span style={isReady? styles.cursor : {}}>|</span>
+                    <span className={isReady? CURSOR_CLASS_NAME: ''}>|</span>
                 </p>
             </div>
         );
