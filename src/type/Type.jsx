@@ -46,7 +46,7 @@ class TypeWriter extends React.Component {
             this.getNextState();
         }
         return (
-            <div className="type-container">
+            <div className={'type-container'}>
                 <p>
                     {toPrint}
                     <span className={isReady? CURSOR_CLASS_NAME: ''}>|</span>
