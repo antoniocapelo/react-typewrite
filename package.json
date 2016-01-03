@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "author": "",
   "description": "ReactJS component that simulates the effect of typing on a text editor",
-  "main": "build",
+  "main": "build/index.js",
+  "files": ["build/index.js", "build/react-typewrite.css"],
   "scripts": {
     "start": "webpack-dev-server",
     "test": "karma start",

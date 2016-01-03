@@ -1,0 +1,23 @@
+@-webkit-keyframes blinkKeyFrame {
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
+@-moz-keyframes blinkKeyFrame {
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
+keyframes blinkKeyFrame {
+    0% {opacity: 1;}
+    50% {opacity: 0;}
+    100% {opacity: 1;}
+}
+
+.react-typewrite-cursor {
+    -webkit-animation: blinkKeyFrame steps(1) 1s infinite; /* Safari 4+ */
+    -moz-animation:    blinkKeyFrame steps(1) 1s infinite; /* Fx 5+ */
+    -o-animation:      blinkKeyFrame steps(1) 1s infinite; /* Opera 12+ */
+    animation:         blinkKeyFrame steps(1) 1s infinite; /* IE 10+, Fx 29+ */
+}
+

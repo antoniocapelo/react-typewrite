@@ -47,7 +47,6 @@ var distConfigs  = {
     },
     externals:  {
         react: 'react',
-        radium: 'radium',
         /* more complicated mapping for lodash */
         /* we need to access it differently depending */
         /* on the environment */

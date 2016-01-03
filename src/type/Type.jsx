@@ -1,6 +1,7 @@
 import React from 'react';
-import styles from './TypeStyles.js';
 import _ from 'lodash';
+require('./TypeStyles.css')
+
 /**
 Props:
     * text {String || [String]} - text to type, it can be a single string or an array of strigns
