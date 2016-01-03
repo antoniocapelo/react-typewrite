@@ -69,10 +69,6 @@ var distConfigs  = {
     plugins: [
         new Clean(['build']),
         new ExtractTextPlugin('styles.css'),
-        new webpack.optimize.CommonsChunkPlugin(
-            'vendor',
-            '[name].js'
-        ),
         new webpack.DefinePlugin({
             'process.env': {
                 // This affects react lib size
