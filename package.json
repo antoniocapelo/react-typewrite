@@ -1,6 +1,6 @@
 {
-  "name": "reactjs-typewriter",
-  "version": "1.0.2",
+  "name": "react-typewrite",
+  "version": "1.0.0",
   "author": "",
   "description": "ReactJS component that simulates the effect of typing on a text editor",
   "main": "build",
