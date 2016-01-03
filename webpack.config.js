@@ -68,7 +68,7 @@ var distConfigs  = {
     },
     plugins: [
         new Clean(['build']),
-        new ExtractTextPlugin('styles.css'),
+        new ExtractTextPlugin('react-typewrite.css'),
         new webpack.DefinePlugin({
             'process.env': {
                 // This affects react lib size
