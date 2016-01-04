@@ -7,8 +7,8 @@ Props:
     * text {String || [String]} - text to type, it can be a single string or an array of strigns
     * randomize {Boolean} - wether the keystroke times should be randomize up to a defined value or not (default: false)
     * timeout {Number} - time (ms) between key strikes (it can be the exact time, if randomize is disabled, or the maximum time, if randomize = true
-    * initialDelay {Number} - time (ms) before starting to type the first word
-    * betweenDelay {Number} - time (ms) took between strings if an array is passed as text prop
+    * initialDelay {Number} - time (ms) before starting to type the first word (default: 0ms)
+    * betweenDelay {Number} - time (ms) took between strings if an array is passed as text prop (default: 100ms)
     * cleanUp {Boolean} wether the strings should be cleaned after typing them (default: false)
  **/
 
@@ -32,7 +32,7 @@ class TypeWriter extends React.Component {
             cleaning: false,
             textIndex: 0,
             textsToType: textsToType,
-            delay: this.props.initialDelay,
+            delay: this.props.initialDelay || 0,
             justStarted: true
         };
     }
@@ -155,5 +155,17 @@ class TypeWriter extends React.Component {
 
 TypeWriter.ERASE_SPEED         = 100;
 TypeWriter.END_OF_STRING_DELAY = 100;
+
+TypeWriter.propTypes = {
+    text: React.PropTypes.oneOfType([
+        React.PropTypes.string,
+        React.PropTypes.arrayOf(React.PropTypes.string)
+    ]).isRequired,
+    timeout:   React.PropTypes.number.isRequired,
+    randomize:  React.PropTypes.bool,
+    initialDelay: React.PropTypes.number,
+    betweenDelay: React.PropTypes.number,
+    cleanUp: React.PropTypes.bool,
+}
 
 module.exports = TypeWriter;

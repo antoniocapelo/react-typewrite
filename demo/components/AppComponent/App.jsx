@@ -13,8 +13,8 @@ class App extends React.Component {
         return (
             <div className="app" style={styles.base}>
                 <h1>React typewriter demo</h1>
-                <p style={styles.labels}>timeout: 400 | randomized | init delay: 2000 | betweenDelay: 1000 | no clean up</p>
-                <Type text={['yo']} timeout={400} randomize={true} initialDelay={2000} betweenDelay={1000}/>
+                <p style={styles.labels}>timeout: 400 | randomized | betweenDelay: 1000 | no clean up</p>
+                <Type text={['yo!']} timeout={400} randomize={true}  betweenDelay={1000}/>
                 <p style={styles.labels}>timeout: 400 | randomized | init delay: 2000 | betweenDelay: 1000 | no clean up</p>
                 <Type text={['one thing', ', two things', ' and more...']} timeout={400} randomize={true} initialDelay={2000} betweenDelay={1000} cleanUp={false}/>
                 <p style={styles.labels}>timeout: 100 | randomized | init delay: 1000 | betweenDelay: 1000 | with clean up</p>
