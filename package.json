@@ -1,6 +1,6 @@
 {
   "name": "react-typewrite",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "react-typewrite",
   "main": "lib/ReactTypewrite.js",
   "style": "lib/ReactTypewrite.css",
