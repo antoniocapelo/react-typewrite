@@ -1,0 +1,29 @@
+{
+  "name": "react-typewrite",
+  "version": "0.0.0",
+  "description": "react-typewrite",
+  "main": "dist/react-typewrite.min.js",
+  "homepage": "https://github.com/antoniocapelo/react-typewrite",
+  "authors": [
+    "António Capelo"
+  ],
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "react",
+    "react-component"
+  ],
+  "license": "MIT",
+  "ignore": [
+    ".editorconfig",
+    ".gitignore",
+    "package.json",
+    "src",
+    "node_modules",
+    "example",
+    "test"
+  ]
+}
