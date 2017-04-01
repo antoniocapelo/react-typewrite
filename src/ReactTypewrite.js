@@ -13,15 +13,17 @@ Props:
  **/
 
 function calculateRandomTimeouts(textsToType, timeout) {
-    let randomArray = [];
-    let biggestStringLength = _.reduce(textsToType, function(biggestLen, arr) {
+    const randomArray = [];
+    const biggestStringLength = _.reduce(textsToType, function(biggestLen, arr) {
         return biggestLen > arr.length ? biggestLen : arr.length;
     }, 0);
+
     for (let i = 0 ; i < biggestStringLength; i ++) {
         let random = Math.ceil(Math.random() * timeout);
         let minimumRandom = random > 150 ? random : 150;
         randomArray.push(minimumRandom);
     }
+
     return randomArray;
 }
 
@@ -30,7 +32,7 @@ class ReactTypewrite extends React.Component {
     constructor(props) {
         super(props);
         let randoms = [];
-        let textsToType = _.isArray(this.props.text) ? this.props.text : [this.props.text];
+        let textsToType = this.props.children.props.children;
 
         // getting random array
         if (this.props.randomize) {
@@ -48,34 +50,40 @@ class ReactTypewrite extends React.Component {
             delay: this.props.initialDelay || 0,
             justStarted: true
         };
+
+        console.log(this.state);
+
         this.mounted = false;
+        this.cursorClassName = props.hardBlink ? 'react-typewrite-cursor-blink hard' : 'react-typewrite-cursor-blink';
     }
+
     componentDidMount() {
         this.mounted = true;
     }
+
     componentWillUnmount() {
         this.mounted = false;
     }
+
     render() {
-        const CURSOR_CLASS_NAME = this.props.hardBlink ? 'react-typewrite-cursor-blink hard' : 'react-typewrite-cursor-blink' ;
-        const isReady = this.ready();
+        const isReady = this.isReady();
         const baseStr = _.take(this.state.textsToType, this.state.textIndex).join('');
         const newStr = this.state.base.substring(0, this.state.current);
-        const toPrint = this.props.cleanUp? newStr : baseStr + newStr;
+        const toPrint = this.props.cleanUp ? newStr : baseStr + newStr;
 
         if (!isReady) {
             this.getNextState();
         }
 
+        const newEl = React.cloneElement(this.props.children, {}, toPrint, <span className={isReady? this.cursorClassName: ''}>|</span>);
+
         return (
             <div className={'type-container'}>
-                <p>
-                    {toPrint}
-                    <span className={isReady? CURSOR_CLASS_NAME: ''}>|</span>
-                </p>
+                { newEl }
             </div>
         );
     }
+
     getNextState() {
         let baseString = this.state.base;
         let textIndex  = this.state.textIndex;
@@ -125,38 +133,43 @@ class ReactTypewrite extends React.Component {
                 }
         }).bind(this), timeout);
     }
+
     // Utility functions
     getTimeout() {
         return this.props.randomize ? this.state.randoms[this.state.current] : this.props.timeout;
     }
+
     finishedCleaning() {
         return this.props.cleanUp && this.stringAtBegining();
     }
+
     shouldUpdateTextIndex() {
         return (this.finishedCleaning() && this.thereAreMoreStringsLeft()) ||
             (!this.props.cleanUp && this.stringAtEnd() && this.thereAreMoreStringsLeft());
     }
+
     getNextTextIndex() {
         return this.state.textIndex + 1;
     }
+
     stringAtEnd(index) {
         let idx = index || this.state.current;
         return idx === this.state.total; 
     }
+
     stringAtBegining(index) {
         let idx = index || this.state.current;
         return idx === 0 && !this.state.justStarted;
     }
+
     thereAreMoreStringsLeft() {
         return this.state.textIndex < (this.state.textsToType.length -1);
     }
-    ready(state) {
+    
+    isReady(state) {
         // it's ready if no cleanUp is required and state.current > total
         // or if the cleanUp isrequired and current === 0 and already printed something
         //
-        if (!this.props.text.length) {
-            return true;
-        }
         if (this.props.cleanUp) {
             return !this.thereAreMoreStringsLeft() && this.stringAtBegining();
         } else {
@@ -168,15 +181,20 @@ class ReactTypewrite extends React.Component {
     }
 }
 
-ReactTypewrite.ERASE_SPEED         = 100;
-ReactTypewrite.END_OF_STRING_DELAY = 100;
+ReactTypewrite.ERASE_SPEED              = 100;
+ReactTypewrite.DEFAULT_TIMEOUT          = 500;
+ReactTypewrite.END_OF_STRING_DELAY      = 100;
+
+ReactTypewrite.defaultProps = {
+    timeout: ReactTypewrite.DEFAULT_TIMEOUT,
+};
 
 ReactTypewrite.propTypes = {
     text: React.PropTypes.oneOfType([
         React.PropTypes.string,
         React.PropTypes.arrayOf(React.PropTypes.string)
     ]).isRequired,
-    timeout:   React.PropTypes.number.isRequired,
+    timeout:   React.PropTypes.number,
     randomize:  React.PropTypes.bool,
     initialDelay: React.PropTypes.number,
     betweenDelay: React.PropTypes.number,
