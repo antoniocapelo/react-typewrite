@@ -3,22 +3,20 @@ import _ from 'lodash';
 
 /**
 Props:
-    * text {String || [String]} - text to type, it can be a single string or an array of strigns
-    * randomize {Boolean} - wether the keystroke times should be randomize up to a defined value or not (default: false)
     * timeout {Number} - time (ms) between key strikes (it can be the exact time, if randomize is disabled, or the maximum time, if randomize = true
     * initialDelay {Number} - time (ms) before starting to type the first word (default: 0ms)
-    * betweenDelay {Number} - time (ms) took between strings if an array is passed as text prop (default: 100ms)
+    * eraseDelay {Number} - time (ms) before starting to clean up (default: 1000ms)
+    * eraseSpeed  {Number} - time (ms) between removing each letter (default: 100ms)
+    * initialDelay {Number} - time (ms) before starting to type the first word (default: 0ms)
+    * randomize {Boolean} - wether the keystroke times should be randomize up to a defined value or not (default: false)
     * cleanUp {Boolean} wether the strings should be cleaned after typing them (default: false)
     * hardBlink {Boolean} cursor blinking in hard mode - no animation (default: false)
  **/
 
 function calculateRandomTimeouts(textsToType, timeout) {
     const randomArray = [];
-    const biggestStringLength = _.reduce(textsToType, function(biggestLen, arr) {
-        return biggestLen > arr.length ? biggestLen : arr.length;
-    }, 0);
 
-    for (let i = 0 ; i < biggestStringLength; i ++) {
+    for (let i = 0 ; i < textsToType.length; i ++) {
         let random = Math.ceil(Math.random() * timeout);
         let minimumRandom = random > 150 ? random : 150;
         randomArray.push(minimumRandom);
@@ -30,28 +28,31 @@ function calculateRandomTimeouts(textsToType, timeout) {
 
 class ReactTypewrite extends React.Component {
     constructor(props) {
+        if (!props.children) {
+            console.warn('Warning: A single children must be provided to this component.')
+            return;
+        }
+
         super(props);
         let randoms = [];
-        let textsToType = this.props.children.props.children;
+        let textToType = this.props.children.props.children;
 
         // getting random array
         if (this.props.randomize) {
-            randoms = calculateRandomTimeouts(textsToType, this.props.timeout);
+            randoms = calculateRandomTimeouts(textToType, this.props.timeout);
         }
 
         this.state = {
-            total: textsToType[0].length,
-            base: textsToType[0],
+            total: textToType.length,
+            base: textToType,
             current: 0,
             randoms: randoms,
             cleaning: false,
             textIndex: 0,
-            textsToType: textsToType,
-            delay: this.props.initialDelay || 0,
+            textsToType: textToType,
+            delay: this.props.initialDelay,
             justStarted: true
         };
-
-        console.log(this.state);
 
         this.mounted = false;
         this.cursorClassName = props.hardBlink ? 'react-typewrite-cursor-blink hard' : 'react-typewrite-cursor-blink';
@@ -67,15 +68,15 @@ class ReactTypewrite extends React.Component {
 
     render() {
         const isReady = this.isReady();
-        const baseStr = _.take(this.state.textsToType, this.state.textIndex).join('');
+        // const baseStr = _.take(this.state.textsToType, this.state.textIndex).join('');
         const newStr = this.state.base.substring(0, this.state.current);
-        const toPrint = this.props.cleanUp ? newStr : baseStr + newStr;
+        // const toPrint = this.props.cleanUp ? newStr : baseStr + newStr;
 
         if (!isReady) {
             this.getNextState();
         }
 
-        const newEl = React.cloneElement(this.props.children, {}, toPrint, <span className={isReady? this.cursorClassName: ''}>|</span>);
+        const newEl = React.cloneElement(this.props.children, {}, newStr, <span className={isReady? this.cursorClassName: ''}>|</span>);
 
         return (
             <div className={'type-container'}>
@@ -99,24 +100,24 @@ class ReactTypewrite extends React.Component {
         if (this.state.delay) {
             delay = this.state.delay;
         } else {
-            delay = (this.stringAtBegining() || this.stringAtEnd()) ? this.props.betweenDelay || ReactTypewrite.END_OF_STRING_DELAY : undefined;
+            delay = (this.stringAtBegining() || this.stringAtEnd()) ? this.props.eraseDelay : undefined;
         }
 
         // check if we should change string 
-        if (this.shouldUpdateTextIndex()) {
-            textIndex  = this.getNextTextIndex();
-            baseString = this.state.textsToType[textIndex];
-            isCleaning = false;
-            current = 0;
-            justStarted = true;
-        }
+        // if (this.shouldUpdateTextIndex()) {
+            // textIndex  = this.getNextTextIndex();
+            // baseString = this.state.textsToType[textIndex]DEFAULT_ERASE_DELAY
+            // isCleaning = false;
+            // current = 0;
+            // justStarted = true;
+        // }
 
 
         // next timeout
         // it can be the delay (on first char typed) --> state.delay
         // if typing, get the timeout --> getTimeout()
         // if cleaning, use 100 as default value
-        let timeout = delay ?  delay : (isCleaning ? ReactTypewrite.ERASE_SPEED : this.getTimeout());
+        let timeout = delay ?  delay : (isCleaning ? ReactTypewrite.DEFAULT_ERASE_SPEED : this.getTimeout());
 
         window.setTimeout((function() {
                 if (this.mounted) {
@@ -139,14 +140,13 @@ class ReactTypewrite extends React.Component {
         return this.props.randomize ? this.state.randoms[this.state.current] : this.props.timeout;
     }
 
-    finishedCleaning() {
-        return this.props.cleanUp && this.stringAtBegining();
-    }
+    // finishedCleaning() {
+        // return this.props.cleanUp && this.stringAtBegining();
+    // }
 
-    shouldUpdateTextIndex() {
-        return (this.finishedCleaning() && this.thereAreMoreStringsLeft()) ||
-            (!this.props.cleanUp && this.stringAtEnd() && this.thereAreMoreStringsLeft());
-    }
+    // shouldUpdateTextIndex() {
+        // return (this.finishedCleaning() || !this.props.cleanUp && this.stringAtEnd());
+    // }
 
     getNextTextIndex() {
         return this.state.textIndex + 1;
@@ -162,43 +162,41 @@ class ReactTypewrite extends React.Component {
         return idx === 0 && !this.state.justStarted;
     }
 
-    thereAreMoreStringsLeft() {
-        return this.state.textIndex < (this.state.textsToType.length -1);
-    }
-    
     isReady(state) {
         // it's ready if no cleanUp is required and state.current > total
         // or if the cleanUp isrequired and current === 0 and already printed something
-        //
         if (this.props.cleanUp) {
-            return !this.thereAreMoreStringsLeft() && this.stringAtBegining();
+            return this.stringAtBegining();
         } else {
             // if no cleanup, check if the current string is at the end and
             // if we're on the last string of the array
-            return !this.thereAreMoreStringsLeft() && this.stringAtEnd();
+            this.stringAtEnd();
         }
-        //return (this.props.cleanUp === false && this.state.current >= this.state.total) || !(this.state.current <= this.state.total); 
     }
 }
 
-ReactTypewrite.ERASE_SPEED              = 100;
+ReactTypewrite.DEFAULT_ERASE_SPEED      = 100;
 ReactTypewrite.DEFAULT_TIMEOUT          = 500;
-ReactTypewrite.END_OF_STRING_DELAY      = 100;
+ReactTypewrite.DEFAULT_INITIAL_DELAY    = 0;
+ReactTypewrite.DEFAULT_ERASE_DELAY      = 1000;
 
 ReactTypewrite.defaultProps = {
     timeout: ReactTypewrite.DEFAULT_TIMEOUT,
+    initialDelay: ReactTypewrite.DEFAULT_INITIAL_DELAY,
+    eraseDelay: ReactTypewrite.DEFAULT_ERASE_DELAY,
+    eraseSpeed: ReactTypewrite.DEFAULT_ERASE_SPEED,
 };
 
 ReactTypewrite.propTypes = {
-    text: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.arrayOf(React.PropTypes.string)
-    ]).isRequired,
     timeout:   React.PropTypes.number,
-    randomize:  React.PropTypes.bool,
     initialDelay: React.PropTypes.number,
-    betweenDelay: React.PropTypes.number,
+    eraseDelay: React.PropTypes.number,
+    eraseSpeed: React.PropTypes.number,
+    randomize:  React.PropTypes.bool,
     cleanUp: React.PropTypes.bool,
+    hardBlink: React.PropTypes.bool,
+    hardBlink: React.PropTypes.bool,
+    children: React.PropTypes.element.isRequired,
 }
 
 module.exports = ReactTypewrite;
