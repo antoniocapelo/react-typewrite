@@ -1,7 +1,7 @@
-.type-container .react-typewrite-cursor-blink {
+.react-typewrite-cursor-blink {
   animation: blinkKeyFrame 1.2s cubic-bezier(0.41, 0.2, 0.58, 1) 0s infinite;
 }
-.type-container .react-typewrite-cursor-blink.hard {
+.react-typewrite-cursor-blink.hard {
   animation: blinkKeyFrame steps(1) 1.2s infinite;
 }
 @keyframes blinkKeyFrame {
