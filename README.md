@@ -24,7 +24,7 @@ The easiest way to use react-typewrite is to install it from NPM and include it 
 You can also use the standalone build by including `dist/react-typewrite.js` in your page. If you use this, make sure you have already included React, and it is available as a global variable.
 
 Just require the component and use it on your ReactJS app.
-Don't forget to include the component stylesheet, either ``lib/ReactTypewrite.css`` (if installed from NPM) or ``build/react-typewrite.min.css`` (if installed from Bower). How you'll include the component style - either by requiring it, including directly on the html, importing it - is up to you, just make sure you're using it so that the cursor can blink.
+Don't forget to include the component stylesheet, either ``lib/ReactTypewrite.css`` (if installed from NPM) or ``dist/react-typewrite.min.css`` (if installed from Bower). How you'll include the component style - either by requiring it, including directly on the html, importing it - is up to you, just make sure you're using it so that the cursor can blink.
 
 ```
 npm install react-typewrite --save
@@ -36,18 +36,23 @@ npm install react-typewrite --save
 ```
 var ReactTypewrite = require('react-typewrite');
 
-<ReactTypewrite>Example</ReactTypewrite>
+<ReactTypewrite>
+  <h1>
+    Your component here
+  </h1>
+</ReactTypewrite>
 ```
 
 ### Properties
 
-* **text** {String || [String]} - text to type, it can be a single string or an array of strigns
-* **randomize** {Boolean} - wether the keystroke times should be randomize up to a defined value or not (default: false)
 * **timeout** {Number} - time (ms) between key strikes (it can be the exact time, if randomize is disabled, or the maximum time, if randomize = true
 * **initialDelay** {Number} - time (ms) before starting to type the first word (default: 0ms)
-* **betweenDelay** {Number} - time (ms) took between strings if an array is passed as text prop (default: 100ms)
+* **eraseDelay** {Number} - time (ms) before starting to clean up (default: 1000ms)
+* **eraseSpeed**  {Number} - time (ms) between removing each letter (default: 100ms)
+* **initialDelay** {Number} - time (ms) before starting to type the first word (default: 0ms)
+* **randomize** {Boolean} - wether the keystroke times should be randomize up to a defined value or not (default: false)
 * **cleanUp** {Boolean} wether the strings should be cleaned after typing them (default: false)
-
+* **hardBlink** {Boolean} cursor blinking in hard mode - no animation (default: false)
 
 ## Development (`src`, `lib` and the build process)
 
