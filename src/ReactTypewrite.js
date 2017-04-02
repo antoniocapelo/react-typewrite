@@ -13,10 +13,10 @@ Props:
     * hardBlink {Boolean} cursor blinking in hard mode - no animation (default: false)
  **/
 
-function calculateRandomTimeouts(textsToType, timeout) {
+function calculateRandomTimeouts(textToType, timeout) {
     const randomArray = [];
 
-    for (let i = 0 ; i < textsToType.length; i ++) {
+    for (let i = 0 ; i < textToType.length; i ++) {
         let random = Math.ceil(Math.random() * timeout);
         let minimumRandom = random > 150 ? random : 150;
         randomArray.push(minimumRandom);
@@ -25,21 +25,22 @@ function calculateRandomTimeouts(textsToType, timeout) {
     return randomArray;
 }
 
+const hardBlinkCssClass = 'react-typewrite-cursor-blink hard' ;
+const regularBlinkCssClass = 'react-typewrite-cursor-blink' ;
 
-class ReactTypewrite extends React.Component {
+class ReactTypewrite extends React.PureComponent {
     constructor(props) {
         if (!props.children) {
             console.warn('Warning: A single children must be provided to this component.')
-            return;
         }
 
         super(props);
         let randoms = [];
-        let textToType = this.props.children.props.children;
+        let textToType = (props.children && props.children.props.children) ? props.children.props.children : '';
 
-        // getting random array
-        if (this.props.randomize) {
-            randoms = calculateRandomTimeouts(textToType, this.props.timeout);
+        // getting randomized timeouts array
+        if (props.randomize) {
+            randoms = calculateRandomTimeouts(textToType, props.timeout);
         }
 
         this.state = {
@@ -48,32 +49,70 @@ class ReactTypewrite extends React.Component {
             current: 0,
             randoms: randoms,
             cleaning: false,
-            textIndex: 0,
-            textsToType: textToType,
-            delay: this.props.initialDelay,
-            justStarted: true
+            textToType: textToType,
+            delay: props.initialDelay,
+            justStarted: true,
+            mounted: false,
         };
 
-        this.mounted = false;
-        this.cursorClassName = props.hardBlink ? 'react-typewrite-cursor-blink hard' : 'react-typewrite-cursor-blink';
+        this.updateTimeout = null;
+        this.cursorClassName = props.hardBlink ? hardBlinkCssClass : regularBlinkCssClass;
     }
 
     componentDidMount() {
-        this.mounted = true;
+        this.setState({ mounted: true });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.children !== this.props.children) {
+            clearTimeout(this.updateTimeout); 
+
+            let randoms = [];
+            let textToType = (nextProps.children && nextProps.children.props.children) ? nextProps.children.props.children : '';
+
+            // getting randomized timeouts array
+            if (nextProps.randomize) {
+                randoms = calculateRandomTimeouts(textToType, nextProps.timeout);
+            }
+
+            this.setState({
+                total: textToType.length,
+                base: textToType,
+                current: 0,
+                randoms: randoms,
+                cleaning: false,
+                textToType: textToType,
+                delay: nextProps.initialDelay,
+                justStarted: true,
+            });
+
+            this.updateTimeout = null;
+            this.cursorClassName = nextProps.hardBlink ? hardBlinkCssClass : regularBlinkCssClass;
+        }
+    }
+
+    componentDidUpdate() {
+        if (!this.isReady()) {
+            this.getNextState();
+        } else {
+            this.props.onFinish && this.props.onFinish();
+        }
     }
 
     componentWillUnmount() {
-        this.mounted = false;
+        clearTimeout(this.updateTimeout);
     }
 
     render() {
+        if (!this.props.children) {
+            return null;
+        }
+
         const isReady = this.isReady();
-        // const baseStr = _.take(this.state.textsToType, this.state.textIndex).join('');
         const newStr = this.state.base.substring(0, this.state.current);
-        // const toPrint = this.props.cleanUp ? newStr : baseStr + newStr;
 
         if (!isReady) {
-            this.getNextState();
+            // this.getNextState();
         }
 
         const newEl = React.cloneElement(this.props.children, {}, newStr, <span className={isReady? this.cursorClassName: ''}>|</span>);
@@ -86,8 +125,11 @@ class ReactTypewrite extends React.Component {
     }
 
     getNextState() {
+        if (!this.state.mounted) {
+            return;
+        }
+
         let baseString = this.state.base;
-        let textIndex  = this.state.textIndex;
 
         // get current print direction (writing or erasing)
         let isCleaning = (this.state.cleaning && this.state.current > 0) || (this.stringAtEnd() && this.props.cleanUp);
@@ -97,21 +139,12 @@ class ReactTypewrite extends React.Component {
 
         let delay;
         let justStarted = false;
+
         if (this.state.delay) {
             delay = this.state.delay;
         } else {
             delay = (this.stringAtBegining() || this.stringAtEnd()) ? this.props.eraseDelay : undefined;
         }
-
-        // check if we should change string 
-        // if (this.shouldUpdateTextIndex()) {
-            // textIndex  = this.getNextTextIndex();
-            // baseString = this.state.textsToType[textIndex]DEFAULT_ERASE_DELAY
-            // isCleaning = false;
-            // current = 0;
-            // justStarted = true;
-        // }
-
 
         // next timeout
         // it can be the delay (on first char typed) --> state.delay
@@ -119,37 +152,21 @@ class ReactTypewrite extends React.Component {
         // if cleaning, use 100 as default value
         let timeout = delay ?  delay : (isCleaning ? ReactTypewrite.DEFAULT_ERASE_SPEED : this.getTimeout());
 
-        window.setTimeout((function() {
-                if (this.mounted) {
-                    this.setState({
-                        total: baseString.length,
-                        base: baseString,
-                        current: current,
-                        cleaning: isCleaning,
-                        justStarted: justStarted,
-                        delay: undefined,
-                        textIndex: textIndex,
-                        textsToType: this.state.textsToType
-                    });
-                }
+        this.updateTimeout = setTimeout((function() {
+            this.setState({
+                total: baseString.length,
+                base: baseString,
+                current,
+                cleaning: isCleaning,
+                justStarted: justStarted,
+                delay: undefined,
+            });
         }).bind(this), timeout);
     }
 
     // Utility functions
     getTimeout() {
         return this.props.randomize ? this.state.randoms[this.state.current] : this.props.timeout;
-    }
-
-    // finishedCleaning() {
-        // return this.props.cleanUp && this.stringAtBegining();
-    // }
-
-    // shouldUpdateTextIndex() {
-        // return (this.finishedCleaning() || !this.props.cleanUp && this.stringAtEnd());
-    // }
-
-    getNextTextIndex() {
-        return this.state.textIndex + 1;
     }
 
     stringAtEnd(index) {
@@ -170,7 +187,7 @@ class ReactTypewrite extends React.Component {
         } else {
             // if no cleanup, check if the current string is at the end and
             // if we're on the last string of the array
-            this.stringAtEnd();
+            return this.stringAtEnd();
         }
     }
 }
@@ -197,6 +214,7 @@ ReactTypewrite.propTypes = {
     hardBlink: React.PropTypes.bool,
     hardBlink: React.PropTypes.bool,
     children: React.PropTypes.element.isRequired,
+    onFinish: React.PropTypes.func,
 }
 
 module.exports = ReactTypewrite;
