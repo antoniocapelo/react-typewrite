@@ -1,1 +1,1 @@
-.type-container .react-typewrite-cursor-blink{animation:blinkKeyFrame 1.2s cubic-bezier(.41,.2,.58,1) 0s infinite}.type-container .react-typewrite-cursor-blink.hard{animation:blinkKeyFrame steps(1) 1.2s infinite}@keyframes blinkKeyFrame{0%,100%{opacity:0}50%{opacity:1}}
+.react-typewrite-cursor-blink{animation:blinkKeyFrame 1.2s cubic-bezier(.41,.2,.58,1) 0s infinite}.react-typewrite-cursor-blink.hard{animation:blinkKeyFrame steps(1) 1.2s infinite}@keyframes blinkKeyFrame{0%,100%{opacity:0}50%{opacity:1}}

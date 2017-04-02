@@ -190,11 +190,7 @@ class ReactTypewrite extends React.PureComponent {
 
     const newEl = React.cloneElement(this.props.children, {}, newStr, <span className={isReady ? this.cursorClassName : ''}>|</span>); // eslint-disable-line react/jsx-filename-extension
 
-    return (
-      <div className={'type-container'}>
-        { newEl }
-      </div>
-    );
+    return newEl;
   }
 
 }

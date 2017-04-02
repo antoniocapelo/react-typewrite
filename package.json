@@ -1,6 +1,6 @@
 {
   "name": "react-typewrite",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "react-typewrite",
   "main": "lib/ReactTypewrite.js",
   "style": "lib/ReactTypewrite.css",
@@ -21,9 +21,9 @@
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
     "gulp": "^3.9.0",
-    "react": "^0.14.0",
+    "react": "^15.4.2",
     "react-component-gulp-tasks": "^0.7.6",
-    "react-dom": "^0.14.0"
+    "react-dom": "^15.4.2"
   },
   "peerDependencies": {
     "react": "^15.4.2"
